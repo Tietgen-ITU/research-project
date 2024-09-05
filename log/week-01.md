@@ -12,7 +12,32 @@ Also we talked about you were going to travel, and for that reason we could not 
 
 
 # Supervision meeting notes
+- Maybe we can still get some numerical numbers. But we should not do an extensive performance analysis.
+- Our contribution is to make an implementation proposal. 
+  - Another goal if things go well, what could we measure, and reason about it.  
+- Not necessary to reference meta paper.
+
+- There could be other things when we write to disk that could be interesting. 
+
+**How to write the paper**
+- Don't care about the number of pages, more like that we can convey the information good enough
+- A plan section can be included to describe next steps. 
+
+**How to structure the Project Proposal**
+- Motivation is already written
+- write intended learning outcomes
+- Todo/tasks about what to do during the project
+- Method is experimental
+
+**Pinar travels**
+- Create teams channel 
+- Meet Monday in september 30th
+- And we are maybe going to have supervision next week but decision will be in last minute
 
 
 # Actions
-
+- Create teams channel
+- Invite pinar
+- Send project proposal to pinar
+  - If approved go through DuckDB to get it to know it.
+- Pinar will ping Samsung about access to SSD's
