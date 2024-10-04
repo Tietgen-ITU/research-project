@@ -1,3 +1,6 @@
 [submodule "duckdb"]
 	path = duckdb
 	url = https://github.com/arnenator/duckdb.git
+[submodule "liburing"]
+	path = liburing
+	url = https://github.com/axboe/liburing
