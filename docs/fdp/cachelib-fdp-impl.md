@@ -18,8 +18,20 @@ CacheLib handles its communication with the FDP supported NVMe through the class
 The FDP implementation is then used in the `Device.cpp` and `Device.hpp`. What they essentially do is to provide a common interface for memory devices. Here they have two concrete implementations:
 
 - **FileDevice** - Manages reads and writes to disk (we assume)
-- **MemoryDevice** - Manages reads and writes to main memory 
+- **MemoryDevice** - Manages reads and writes to main memory, it is described in the documentation to be a test class(So it is not relevant) 
 
-## 2 - A deeper look into `FDPNVMe.cpp`
+> [!NOTE]
+> All the IO passthru code is implemented in their Folly library. In there they add a reference to the [Liburing](https://github.com/axboe/liburing/tree/master) library which is implemented by Jens Axboe.
 
-This section describes what the `FDPNVMe.cpp` file introduces and provides. It will go through some of the code where it specifically handles read and write.
+## 2 - A deeper look
+
+### `FDPNVMe.cpp`
+
+This section describes what the `FDPNVMe.cpp` file introduces and provides. It will go through some of the code where it specifically handles read and write. `FDPNVMe.cpp` implements the `FDPNVMe` class. This class has two important methods, namely `prepReadUringCmdSqe()` and `prepWriteUringCmdSqe()`. These two commands is an essential part to prepare the entry for the `io_uring`. Both of these methods call a private method called `prepFdpUringCmdSqe()`.
+> [!NOTE]
+> `sq` stands for *submission queue* and `sqe` stands for *submission queue entry*
+
+`prepFdpUringCmdSqe()` essentially prepares the entry by populating the entry with FDP specific directives. 
+
+### `Device.cpp`
+
