@@ -10,3 +10,17 @@ We will write work documents in the `./docs` directory. Here we will try to docu
 
 ## Progress and Supervision logs
 In `docs/supervision` there will be a weekly log of progress and supervision meeting notes.
+
+# Building DuckDB
+1. Initialize the submodule by running the following command:
+
+```
+git submodule update --init --recursive
+```
+2. Build DuckDB
+```
+cd duckdb
+GEN=ninja make
+```
+
+The DuckDB binary will be located `build/release/duckdb` in the submodule `duckdb`.
