@@ -1,10 +1,9 @@
 #include <iostream>
 
-#include "stupid.hpp"
+#include "liburing/src/include/liburing.h"
 
 int main()
 {
     std::cout << "Hello, World!" << std::endl;
-    stupid::stupid();
     return 0;
 }
