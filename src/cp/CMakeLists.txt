@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(fdptest)
+project(cp_uring)
 
 
 set(LIBURING_SOURCE_DIR "${PROJECT_SOURCE_DIR}/../../liburing/src")
@@ -11,9 +11,9 @@ if(NOT LIBURING)
 message(FATAL_ERROR "liburing not found in ${LIBURING_SOURCE_DIR}")
 endif()
 
-add_executable(fdp "main.cpp")
+add_executable(cpring "main.cpp")
 
-target_link_libraries(fdp PRIVATE LIBURING)
+target_link_libraries(cpring PRIVATE LIBURING)
 
-target_include_directories(fdp PRIVATE
+target_include_directories(cpring PRIVATE
                                     ${LIBURING_INCLUDE_DIR})
