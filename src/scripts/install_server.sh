@@ -1,10 +1,11 @@
 #!/bin/bash
+DIR=/home/pinar
 
 # Create .local folder
-mkdir ~/.local
+mkdir $DIR/.local
 
 # Download NVME and LIBURING
-cd ~/.local
+cd $DIR/.local
 
 git clone https://github.com/linux-nvme/nvme-cli.git
 cd nvme-cli
@@ -20,6 +21,7 @@ make -j$(nproc)
 make install
 cd ..
 
-echo "export PATH=$PATH:~/.local/nvme-cli/.build" >> ~/.bashrc
-echo "export LIBURING_INCLUDE_DIR=~/.local/liburing/src/include" >> ~/.bashrc
+echo 'alias nvme="$HOME/.local/nvme-cli/.build/nvme"' >> $DIR/.bashrc
+echo 'export PATH=$PATH:~/.local/nvme-cli/.build' >> $DIR/.bashrc
+echo 'export LIBURING_INCLUDE_DIR=~/.local/liburing/src/include' >> $DIR/.bashrc
 
