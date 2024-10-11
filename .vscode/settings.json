@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/workspaces/research-project/src/io"
+    "cmake.sourceDirectory": "/workspaces/research-project/src/io",
+    "makefile.configureOnOpen": false
 }
