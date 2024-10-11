@@ -1,0 +1,1 @@
+add_library(ioring ioring_manager.cpp)
