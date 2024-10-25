@@ -34,4 +34,3 @@ This section describes what the `FDPNVMe.cpp` file introduces and provides. It w
 `prepFdpUringCmdSqe()` essentially prepares the entry by populating the entry with FDP specific directives. 
 
 ### `Device.cpp`
-
