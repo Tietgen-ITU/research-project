@@ -1,4 +1,5 @@
 #include "../include/ioring/ioring_manager.hpp"
+#include "../include/ioring/ioring.hpp"
 
 namespace ioring
 {
