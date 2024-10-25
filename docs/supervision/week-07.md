@@ -1,4 +1,6 @@
 # What have been done during the last week (7)?
+
+@arnenator has looked into how Liburing works in order to get a better understanding of how io_uring works. Furthermore, he has spent some time looking into some C++ code and cmake files in duckdb to become better at these two technologies.
 ___
 
 ## Questions?
