@@ -63,7 +63,9 @@ fill_device() {
 }
 
 setup_device_fpd_disabled() {
+    echo "Resetting the device: $DEVICE\n"
     $(reset_device)
+    echo "Disabling on the device\n"
     $(disable_fdp)
     
     local var PRECON_UTIL={$1-0}
@@ -71,7 +73,9 @@ setup_device_fpd_disabled() {
     local var CREATE_NS="$NVME_CMD create-ns $DEVICE -b $BLOCK_SIZE --nsze=$DEVICE_CAP --ncap=$DEVICE_CAP"
     local var ATTACH_NS="$NVME_CMD attach-ns $DEVICE --namespace-id=$NAMESPACE --controllers=$CONTROLLER"
 
+    echo "Creating namepace with size: $DEVICE_CAP, and block size: $BLOCK_SIZE\n" 
     $CREATE_NS
+    echo "Attaching the namespace to the device: $DEVICE.\n"
     $ATTACH_NS
 
     DEVICE_NS="${DEVICE}n${NAMESPACE}"
@@ -82,7 +86,9 @@ setup_device_fpd_disabled() {
 }
 
 setup_device_fpd_enabled() {
+    echo "Resetting the device: $DEVICE\n"
     $(reset_device)
+    echo "Enabling on the device\n"
     $(enable_fdp)
 
     local var PRECON_UTIL={$1-0}
@@ -90,7 +96,9 @@ setup_device_fpd_enabled() {
     local var CREATE_NS="$NVME_CMD create-ns $DEVICE -b $BLOCK_SIZE --nsze=$DEVICE_CAP --ncap=$DEVICE_CAP --nphndls=8 --phndls=0,1,2,3,4,5,6,7"
     local var ATTACH_NS="$NVME_CMD attach-ns $DEVICE --namespace-id=$NAMESPACE --controllers=$CONTROLLER"
 
+    echo "Creating namepace with size: $DEVICE_CAP, and block size: $BLOCK_SIZE. Using placement handlers: 0,1,2,3,4,5,6,7\n" 
     $CREATE_NS
+    echo "Attaching the namespace to the device: $DEVICE.\n"
     $ATTACH_NS
 
     DEVICE_NS="${DEVICE}n${NAMESPACE}"
@@ -116,10 +124,10 @@ benchmark(){
     BENCH_RUNS=3
     
     $(setup_device_fpd_disabled)
-    fio --name="test_non_fdp" --filename=$DEVICE_NS --rw="randwrite" --size="20" --direct="1" --ioengine="io_uring_cmd" --bs="4k" --iodepth="1" --numjobs="4" --loops=$BENCH_RUNS --allow_create_file="false" --output-format="json" --output="test_non_fdp.txt" --group_reporting
+    fio --name="test_non_fdp" --filename=$DEVICE_NS --rw="randwrite" --size="20" --direct="1" --ioengine="io_uring_cmd" --bs="4k" --iodepth="1" --numjobs="4" --loops=$BENCH_RUNS --allow_create_file="false" --output-format="json" --output="nonfdp_4k_0_1_4.txt" --group_reporting
 
     $(setup_device_fpd_enabled)
-    fio --name="test_fdp" --filename=$DEVICE_NS --rw="randwrite" --size="20" --direct="1" --ioengine="io_uring_cmd" --bs="4k" --iodepth="1" --numjobs="4" --loops=$BENCH_RUNS --allow_create_file="false" --output-format="json" --output="test_fdp.txt" --group_reporting
+    fio --name="test_fdp" --filename=$DEVICE_NS --rw="randwrite" --size="20" --direct="1" --ioengine="io_uring_cmd" --bs="4k" --iodepth="1" --numjobs="4" --loops=$BENCH_RUNS --allow_create_file="false" --output-format="json" --output="fdp_4k_0_1_4.txt" --group_reporting
 
 }
 
