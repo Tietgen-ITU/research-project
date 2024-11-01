@@ -7,6 +7,7 @@ This document tries to describe how Meta has implemented FDP support for NVMe SS
 
 <!--TODO: Write what the reader is going to see in the different sections -->
 
+
 ## 1 - High Level Overview
 
 This section will at a high level introduce what is being added to the project.  
@@ -68,3 +69,5 @@ In this function it uses that `filepaths` and creates the `FdpNvme` instances(It
 Writing directly to device means that the host has to handle some management of where to place that data. That management is handled by the `Device` class. However, the IO requests is abstracted into a class called `IOContext`. 
 
 <!-- TODO: write more about the IO context and IOReq -->
+
+<!-- TODO: Look into the RegionManager:542. It does some translation from an address to an offset -->
