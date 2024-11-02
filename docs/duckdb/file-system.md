@@ -26,6 +26,7 @@ classDiagram
     }
     class VirtualFileSystem {
         - vector~unique_ptr~FileSystem~~ sub_system 
+        - FileSystem default_fs
         - map~CompressionType, FileSystem~ compression_fs 
         - FindFileSystem() FileSystem
         - FindFileSystemInternal() FileSystem
@@ -41,12 +42,12 @@ title: DuckDB Overview of FileSystem
 ---
 classDiagram
     VirtualFileSystem --* LocalFileSystem
-    VirtualFileSystem --* GZipFileSystem
-    VirtualFileSystem --* PipeFileSystem
+    VirtualFileSystem ..> GZipFileSystem
+    VirtualFileSystem ..> PipeFileSystem
     VirtualFileSystem --o FileSystem
 ```
 
-The `LocalFileSystem` is the default file system, that the `VirtualFileSystem` uses when nothing else can be found in `VirtualFileSystem::FindFileSystem()` is called.
+The `LocalFileSystem` is the default file system, that the `VirtualFileSystem` uses when nothing else can be found in `VirtualFileSystem::FindFileSystem()` is called. For that reason the `LocalFileSystem` class is composed by the `VirtualFileSystem`
 
 ### Where is the `VirtualFileSystem` initialized
 
