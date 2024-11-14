@@ -14,7 +14,13 @@ ___
 
 1. This graph have number of `threads/iodepth` on the x axis. Note, here one is kept fixed as 1, so for all diffrent values of threads the `iodepth = 1` and vice versa. The y acis is average IOPS achived on 5 runs.
 
+![image](https://github.com/user-attachments/assets/58efbbef-2c0a-40d9-974d-255c3633c11a)
+
+
 2. This graphs have the `iodepth` on the x axis, and the `thread` count fixed at 32 threads. The y axis, again, is the average IOPS achieved on 5 runs.
+
+![image](https://github.com/user-attachments/assets/8ec8a28f-d9d6-48be-9726-777f81a0c1d7)
+
 
 @emiloh have comments on future improvements/issues:
 
