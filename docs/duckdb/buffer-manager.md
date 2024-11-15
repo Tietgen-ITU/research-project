@@ -67,4 +67,10 @@ However, if there is an existing file, when do we know that we should create a n
 
 In the case where the `TemporaryFileManager` goes through all the available `TemporaryFileHandler`s and none of the return a valid `TemporaryFileIndex` then it creates a new instance of `TemporaryFileHandler`.
 
+> @emiloh thinks that the reason why the files should be able to exponentially handle more indexes is based on the same mechanism as an ArrayList in java. However, this brings the question why not keep it in one file? And this could be due to the amount of data that we are going to occupy on the disk. The data is not being deleted until the whole file is deleted. 
+
 ### Mapping between BlockManager and positions in files
+
+In `DuckDB` they have a `BlockManager`. But in the case where the database has a file where the data is being kept it actually has extended the `BlockManager` with another concrete implementation called the `SingleFileBlockManager`(You can see the creation of it in the `StorageManager` line 190-193).
+
+#### What is the difference between `BlockManager` and `SingleFileBlockManager`?
