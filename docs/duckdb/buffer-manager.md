@@ -71,6 +71,57 @@ In the case where the `TemporaryFileManager` goes through all the available `Tem
 
 ### Mapping between BlockManager and positions in files
 
-In `DuckDB` they have a `BlockManager`. But in the case where the database has a file where the data is being kept it actually has extended the `BlockManager` with another concrete implementation called the `SingleFileBlockManager`(You can see the creation of it in the `StorageManager` line 190-193).
+The `BlockManager` is responsible for managing the data in main memory. It does so by organizing the data with what is being called `Block`s(essentially a FileBuffer). A `Block` has two states, namely `LOADED` and `UNLOADED` representing whether the block is loaded with main memory data or if the `Block` has been `UNLOADED` to disk.
 
-#### What is the difference between `BlockManager` and `SingleFileBlockManager`?
+In `DuckDB` they have a `BlockManager`. But in the case where the database has a file where the data is being kept it actually has extended the `BlockManager` with another concrete implementation called the `SingleFileBlockManager`(You can see the creation of it in the `StorageManager` line 190-193). 
+
+If `DuckDB` is running in an `InMemory` configuration, it uses the concrete implementation of the `BlockManager`, called `InMemoryBlockManager`. 
+
+However, the `StandardBufferManager` is actually using the `InMemoryBlockManager`. For that reason we are going to looke 
+
+
+
+#### `InMemoryBlockManager` vs. `SingleFileBlockManager`?
+
+The concepts are the same. The manages blocks in different domains. `InMemoryBlockManager` manages blocks in main memory, this is the one used to handle the main memory blocks in the `StandardBufferManager`. The `SingleFileBlockManager` manages blocks in a single file.
+
+## Flow of spilling to disk
+
+Before going through the flow of spilling to disk, we need to have the following two questions in mind:
+
+- How do we manage what is being spilled to disk?
+- How do we use the data spilled to disk and get it back to main memory?
+- When do we spill to disk?
+
+The journey of spilling to disk starts at the `StandardBufferManager::WriteTemporaryBuffer()`. We have already described previously how the TemporaryFileManager and handlers work and that the `WriteTemporaryBuffer()` function uses that to first write the header but then use the `FileBuffer`, which in reality is an instance of type `Block`, to *unload* the buffer to the temporary file. So the reason why we start at the `WriteTemporaryBuffer()` is because we want to trace back where it is being called and why?. 
+
+The function is first being called by the `BlockHandle::UnloadAndTakeBlock()`. 
+
+```mermaid
+---
+title: Paths to `StandardBufferManager::WriteTemporaryBuffer()`
+---
+flowchart TD
+	StandardBufferManager::BufferAllocatorAllocate --> StandardBufferManager::EvictBlocksOrThrow
+	StandardBufferManager::BufferAllocatorAllocate --> StandardBufferManager::EvictBlocksOrThrow
+	StandardBufferManager::ReserveMemory --> StandardBufferManager::EvictBlocksOrThrow
+	StandardBufferManager::Pin --> StandardBufferManager::EvictBlocksOrThrow
+	StandardBufferManager::ReadBatch --> StandardBufferManager::EvictBlocksOrThrow
+	StandardBufferManager::ReAllocate --> StandardBufferManager::EvictBlocksOrThrow
+	StandardBufferManager::RegisterMemory --> StandardBufferManager::EvictBlocksOrThrow
+	StandardBufferManager::RegisterSmallMemory --> StandardBufferManager::EvictBlocksOrThrow
+	BufferPool::SetLimit --> BufferPool::EvictBlocks
+	StandardBufferManager::EvictBlocksOrThrow --> BufferPool::EvictBlocks 
+	BufferPool::EvictBlocks --> BufferPool::EvictBlocksInternal
+	BufferPool::EvictBlocksInternal --> BlockHandle::Unload
+	StandardBufferManager::Unpin --> BlockHandle::Unload
+	BufferPool::PurgeAgedBlocksInternal --> BlockHandle::Unload
+	BufferPool::EvictBlocksInternal --> BlockHandle::UnloadAndTakeBlock
+	BlockHandle::Unload --> BlockHandle::UnloadAndTakeBlock
+    BlockHandle::UnloadAndTakeBlock --> StandardBufferManager::WriteTemporaryBuffer
+```
+
+The tree just keeps growing. But what can be shown of the above figure is that a lot of the functions are calling each other. 
+
+> [!IMPORTANT]
+> **TODO:** The`StandardBufferManager` contains its own BlockManager, called the `temporary_block_manager` which seems to be the data that the buffer manager manages in memory and then suddenly pushes to the temporary file. Look further into the functions that uses the `temporary_block_manager` go from there.
