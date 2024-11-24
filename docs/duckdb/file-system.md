@@ -26,6 +26,7 @@ classDiagram
     }
     class VirtualFileSystem {
         - vector~unique_ptr~FileSystem~~ sub_system 
+        - FileSystem default_fs
         - map~CompressionType, FileSystem~ compression_fs 
         - FindFileSystem() FileSystem
         - FindFileSystemInternal() FileSystem
@@ -41,7 +42,22 @@ title: DuckDB Overview of FileSystem
 ---
 classDiagram
     VirtualFileSystem --* LocalFileSystem
-    VirtualFileSystem --* GZipFileSystem
-    VirtualFileSystem --* PipeFileSystem
+    VirtualFileSystem ..> GZipFileSystem
+    VirtualFileSystem ..> PipeFileSystem
     VirtualFileSystem --o FileSystem
 ```
+
+The `LocalFileSystem` is the default file system, that the `VirtualFileSystem` uses when nothing else can be found in `VirtualFileSystem::FindFileSystem()` is called. For that reason the `LocalFileSystem` class is composed by the `VirtualFileSystem`
+
+### Where is the `VirtualFileSystem` initialized
+
+In the `Database.cpp` an instance of the `VirtualFileSystem` class is initialized. 
+
+> [!IMPORTANT] 
+> There is a possibility to inject another file system into the database. Look at line 408-409 in `Database.cpp`. An example of extending the file system is by looking at httpfs
+
+## LocalFileSystem
+
+The class `LocalFileSystem` is a simple file/directory system handler that can read and write to files with and without a specific range of bytes.
+
+It uses the OS file system to interact with the disk. That is, the IO path goes through the virtual file system abstraction layer and does not bypass it in order to go directly to the device.
