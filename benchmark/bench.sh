@@ -3,8 +3,10 @@
 DEVICE=/dev/nvme1
 DEVICE_NS=
 DEVICE_NG=/dev/ng1n1
+DEVICE_URI="0000\:ec\:00.0"
 NVME_CMD=/home/pinar/.local/nvme-cli/.build/nvme
 FIO_CMD=/home/pinar/.local/fio/fio
+XNVME_DRIVER_CMD=/home/pinar/.local/xnvme/builddir/toolbox/xnvme-driver
 NAMESPACE=1
 CONTROLLER=0x7
 FDP=0x1D
@@ -128,23 +130,36 @@ export LD_LIBRARY_PATH=/usr/local/lib64
 benchmark(){
     BENCH_BLOCK_SIZES=(4096)
     BENCH_THREADS=(1 2 4 8 16)
-    BENCH_IODEPTH=(1 2 4 8 16 32)
-    BENCH_WORKLOAD_SIZE=(50 100)
-    BENCH_PRECONDITION_UTILIZATION=(20 50 70 100)
+    BENCH_IODEPTH=(1 2 4)
+    BENCH_WORKLOAD_SIZE=(50,100)
+    BENCH_PRECONDITION_UTILIZATION=(20, 50, 70, 100)
     BENCH_RUNS=5
     PATH_TO_OUT_BENCH=/home/pinar/research-project/benchmark
     for bs in "${BENCH_BLOCK_SIZES[@]}" ; do
 	    for threads in "${BENCH_THREADS[@]}" ; do
 		    for iodepth in "${BENCH_IODEPTH[@]}" ; do
+			$XNVME_DRIVER_CMD reset
     			setup_device_fdp_disabled
-   			$FIO_CMD --name="nonfdp" --filename=$DEVICE_NG --rw="randwrite" --size="5GB" --direct="0" --ioengine="io_uring_cmd" --bs=$bs --iodepth=$iodepth --numjobs=$threads --loops=$BENCH_RUNS --allow_file_create="1" --output-format="json" --output="$PATH_TO_OUT_BENCH/nonfdp_${bs}_0_${iodepth}_${threads}.txt" --group_reporting
-
-    			setup_device_fdp_enabled
-    			$FIO_CMD --name="fdp" --filename=$DEVICE_NG --rw="randwrite" --size="30GB" --direct="0" --ioengine="io_uring_cmd" --bs=$bs --iodepth=$iodepth --numjobs=$threads --loops=$BENCH_RUNS --allow_file_create="1" --output-format="json" --output="$PATH_TO_OUT_BENCH/fdp_${bs}_0_${iodepth}_${threads}.txt" --group_reporting --fdp=1 --fdp_pli=0,1,2,3,4,5,6 
-			waf_info
+			$XNVME_DRIVER_CMD
+   			$FIO_CMD --name="nonfdp" --filename=$DEVICE_URI --thread=1 --rw="randrw" --rwmixwrite=60 --size="60%" --time_based=1 --runtime=300 --ioengine="xnvme" --xnvme_be="spdk" --xnvme_dev_nsid=1 --bs=$bs --iodepth=$iodepth --numjobs=$threads --loops=$BENCH_RUNS --output-format="json" --output="$PATH_TO_OUT_BENCH/test_nonfdp_${bs}_0_${iodepth}_${threads}.txt" --group_reporting
+    			
+			$XNVME_DRIVER_CMD reset
+			setup_device_fdp_enabled
+			$XNVME_DRIVER_CMD
+   			$FIO_CMD --name="fdp" --filename=$DEVICE_URI --thread=1 --rw="randrw" --rwmixwrite=60 --size="60%" --time_based=1 --runtime=300 --ioengine="xnvme" --xnvme_be="spdk" --xnvme_dev_nsid=1 --bs=$bs --iodepth=$iodepth --numjobs=$threads --loops=$BENCH_RUNS --output-format="json" --output="$PATH_TO_OUT_BENCH/test_fdp_${bs}_0_${iodepth}_${threads}.txt" --group_reporting --fdp=1 --fdp_pli=0,1,2,3,4,5,6
     	   	    done 
 	   done 
     done
 }
 
+#PATH_TO_OUT_BENCH=/home/pinar/research-project/benchmark
 benchmark
+#$XNVME_DRIVER_CMD reset
+#setup_device_fdp_disabled
+#$XNVME_DRIVER_CMD
+#$FIO_CMD --name="nonfdp" --thread=1 --bs=4k --iodepth=32 --rw="randrw" --rwmixwrite=60 --numjobs=4 --time_based=1 --runtime=60 --size=30% --ioengine="xnvme" --xnvme_be="spdk" --filename="0000\:ec\:00.0" --xnvme_dev_nsid=1 --output-format="json" --output="$PATH_TO_OUT_BENCH/test_nonfdp_4k_0_32_4.txt" --group_reporting
+#$XNVME_DRIVER_CMD reset
+#setup_device_fdp_enabled
+#$XNVME_DRIVER_CMD
+#$FIO_CMD --name="fdp" --thread=1 --bs=4k --iodepth=32 --rw="randrw" --rwmixwrite=60 --numjobs=4 --time_based=1 --runtime=60 --size=30% --ioengine="xnvme" --xnvme_be="spdk" --filename="0000\:ec\:00.0" --xnvme_dev_nsid=1 --output-format="json" --output="$PATH_TO_OUT_BENCH/test_fdp_4k_0_32_4.txt" --group_reporting --fdp=1 --fdp_pli=0,1,2,3,4,5,6
+#$XNVME_DRIVER_CMD reset
