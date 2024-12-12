@@ -1,0 +1,33 @@
+; Inspiration from 
+;  - https://github.com/axboe/fio/blob/master/examples/xnvme-fdp.fio
+;  - https://github.com/axboe/fio/blob/master/examples/uring-cmd-fdp.fio
+
+[global]
+filename=${DEVICE}
+iodepth=${IODEPTH}
+bs=${BS}
+numjobs=${THREADS}
+fdp=1
+time_based=1
+runtime=60
+
+[write-heavy]
+rw=randrw
+rwmixwrite=90
+fdp_pli=0,1,2,3,4
+offset=0%
+size=30%
+
+[write-mid]
+rw=randrw
+rwmixwrite=30
+fdp_pli=5,6
+offset=30%
+size=30%
+
+[write-light]
+rw=randrw
+rwmixwrite=10
+fdp_pli=7
+offset=60%
+size=30%
