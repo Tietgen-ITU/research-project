@@ -141,13 +141,15 @@ benchmark(){
 			$XNVME_DRIVER_CMD reset
     			setup_device_fdp_disabled
 			$XNVME_DRIVER_CMD
-   			$FIO_CMD --name="nonfdp" --filename=$DEVICE_URI --thread=1 --rw="randrw" --rwmixwrite=60 --size="60%" --time_based=1 --runtime=300 --ioengine="xnvme" --xnvme_be="spdk" --xnvme_dev_nsid=1 --bs=$bs --iodepth=$iodepth --numjobs=$threads --loops=$BENCH_RUNS --output-format="json" --output="$PATH_TO_OUT_BENCH/test_nonfdp_${bs}_0_${iodepth}_${threads}.txt" --group_reporting
+   			$FIO_CMD --name="nonfdp" --filename=$DEVICE_URI --thread=1 --rw="randrw" --rwmixwrite=60 --size="100%" --time_based=1 --runtime=600 --ioengine="xnvme" --xnvme_be="spdk" --xnvme_dev_nsid=1 --bs=$bs --iodepth=$iodepth --numjobs=$threads --loops=$BENCH_RUNS --output-format="json" --output="$PATH_TO_OUT_BENCH/test_nonfdp_${bs}_0_${iodepth}_${threads}.txt" --group_reporting
     			
 			$XNVME_DRIVER_CMD reset
 			setup_device_fdp_enabled
 			$XNVME_DRIVER_CMD
-   			$FIO_CMD --name="fdp" --filename=$DEVICE_URI --thread=1 --rw="randrw" --rwmixwrite=60 --size="60%" --time_based=1 --runtime=300 --ioengine="xnvme" --xnvme_be="spdk" --xnvme_dev_nsid=1 --bs=$bs --iodepth=$iodepth --numjobs=$threads --loops=$BENCH_RUNS --output-format="json" --output="$PATH_TO_OUT_BENCH/test_fdp_${bs}_0_${iodepth}_${threads}.txt" --group_reporting --fdp=1 --fdp_pli=0,1,2,3,4,5,6
-    	   	    done 
+   			$FIO_CMD --name="fdp" --filename=$DEVICE_URI --thread=1 --rw="randrw" --rwmixwrite=60 --size="100%" --time_based=1 --runtime=600 --ioengine="xnvme" --xnvme_be="spdk" --xnvme_dev_nsid=1 --bs=$bs --iodepth=$iodepth --numjobs=$threads --loops=$BENCH_RUNS --output-format="json" --output="$PATH_TO_OUT_BENCH/test_fdp_${bs}_0_${iodepth}_${threads}.txt" --group_reporting --fdp=1 --fdp_pli=0,1,2,3,4,5,6
+			$XNVME_DRIVER_CMD reset
+			echo "FDP-$bs-$iodepth-$threads-$(waf_info)" >> ./tester.txt
+ 		done 
 	   done 
     done
 }
@@ -157,9 +159,13 @@ benchmark
 #$XNVME_DRIVER_CMD reset
 #setup_device_fdp_disabled
 #$XNVME_DRIVER_CMD
-#$FIO_CMD --name="nonfdp" --thread=1 --bs=4k --iodepth=32 --rw="randrw" --rwmixwrite=60 --numjobs=4 --time_based=1 --runtime=60 --size=30% --ioengine="xnvme" --xnvme_be="spdk" --filename="0000\:ec\:00.0" --xnvme_dev_nsid=1 --output-format="json" --output="$PATH_TO_OUT_BENCH/test_nonfdp_4k_0_32_4.txt" --group_reporting
+#$FIO_CMD --name="nonfdp" --thread=4 --bs=4k --iodepth=1 --rw="randrw" --rwmixwrite=60 --numjobs=1 --time_based=1 --runtime=300 --size=30% --ioengine="xnvme" --xnvme_be="spdk" --filename="0000\:ec\:00.0" --xnvme_dev_nsid=1 --output-format="json" --output="$PATH_TO_OUT_BENCH/test_nonfdp_4k_0_32_4.txt" --group_reporting
 #$XNVME_DRIVER_CMD reset
 #setup_device_fdp_enabled
 #$XNVME_DRIVER_CMD
-#$FIO_CMD --name="fdp" --thread=1 --bs=4k --iodepth=32 --rw="randrw" --rwmixwrite=60 --numjobs=4 --time_based=1 --runtime=60 --size=30% --ioengine="xnvme" --xnvme_be="spdk" --filename="0000\:ec\:00.0" --xnvme_dev_nsid=1 --output-format="json" --output="$PATH_TO_OUT_BENCH/test_fdp_4k_0_32_4.txt" --group_reporting --fdp=1 --fdp_pli=0,1,2,3,4,5,6
+#tmux new-session -d -s "test"
+#tmux send-keys -t "test".0 'exec python3 waf.py ./tester.txt' ENTER
+#$FIO_CMD --name="fdp" --thread=8 --bs=4k --iodepth=4 --rw="randrw" --rwmixwrite=60 --numjobs=1 --time_based=1 --runtime=310 --size=30% --ioengine="xnvme" --xnvme_be="spdk" --filename="0000\:ec\:00.0" --xnvme_dev_nsid=1 --output-format="json" --output="$PATH_TO_OUT_BENCH/test_fdp_4k_0_32_4.txt" --group_reporting --fdp=1 --fdp_pli=0,1,2,3,4,5,6
+#tmux kill-session -t "test"
 #$XNVME_DRIVER_CMD reset
+
