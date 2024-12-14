@@ -24,3 +24,6 @@ GEN=ninja make
 ```
 
 The DuckDB binary will be located `build/release/duckdb` in the submodule `duckdb`.
+
+# Runnig benchmarks
+Navigate to the benchmark folder and run `run_bench.sh`. This starts a tmux session called experiment, in which runs the experiment.
